@@ -1,11 +1,10 @@
 import { spawn } from 'node:child_process';
 
 export class Task {
-  constructor({ systemPrompt, concurrency = 10, items = [], model, output }) {
+  constructor({ systemPrompt, concurrency = 10, items = [], model }) {
     this.systemPrompt = systemPrompt;
     this.concurrency = concurrency;
     this.model = model;
-    this.outputSchema = output;
     this.items = [...items];
   }
 
@@ -17,10 +16,7 @@ export class Task {
     const total = this.items.length;
     if (total === 0) return;
 
-    let systemPrompt = this.systemPrompt || '';
-    if (this.outputSchema) {
-      systemPrompt += '\n\nReturn your response as JSON matching this schema:\n' + JSON.stringify(this.outputSchema, null, 2);
-    }
+    const systemPrompt = this.systemPrompt || '';
 
     let completed = 0;
     let next = 0;
@@ -56,13 +52,7 @@ export class Task {
         exec(item).then(raw => {
           running--;
           completed++;
-          let output;
-          if (this.outputSchema) {
-            try { output = JSON.parse(raw); } catch { output = raw; }
-          } else {
-            output = raw;
-          }
-          push({ item, output, progress: { completed, total } });
+          push({ item, output: raw, progress: { completed, total } });
           fill();
         });
       }

@@ -18,61 +18,60 @@ Each task gets its own fresh agent with a clean context. A pool of agents proces
 
 - **Fresh context per task.** Each agent only sees the item it's working on. Better focus, lower cost, no cross-contamination.
 - **Concurrent by default.** Control the pool size with `concurrency`.
-- **Stream results.** Async generator yields results as agents complete. Handle them however you want.
+- **Stream results.** Results stream to stdout as agents complete.
 
-## Usage
+## CLI
+
+```bash
+atq -p "Normalize this company name. Return just the name." -i companies.jsonl -c 10 -m claude-sonnet-4-6
+```
+
+**Input** (`companies.jsonl`):
+```jsonl
+{"name": "Google LLC"}
+{"name": "APPLE INC."}
+{"name": "Meta Platforms, Inc."}
+```
+
+**Output** (stdout, one JSON line per completed item):
+```jsonl
+{"item":{"name":"Google LLC"},"output":"Google"}
+{"item":{"name":"APPLE INC."},"output":"Apple"}
+{"item":{"name":"Meta Platforms, Inc."},"output":"Meta"}
+```
+
+**Progress** (stderr):
+```
+[1/3]
+[2/3]
+[3/3]
+```
+
+### Flags
+
+| Short | Long | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| `-p` | `--prompt` | yes | — | Instructions for the agent |
+| `-i` | `--input` | yes | — | Path to JSONL file |
+| `-c` | `--concurrency` | no | `10` | Max parallel agents |
+| `-m` | `--model` | no | — | Model name |
+
+## Library
 
 ```js
 import { Task } from 'atq';
 
-const normalize = new Task({
-  systemPrompt: `You receive a company name as JSON. Return the canonical normalized form.
-For example: "Google LLC" → "Google", "APPLE INC." → "Apple"`,
+const task = new Task({
+  systemPrompt: 'Normalize this company name. Return just the name.',
   concurrency: 10,
-  model: 'claude-opus-4-6',
+  model: 'claude-sonnet-4-6',
+  items: [{ name: 'Google LLC' }, { name: 'APPLE INC.' }],
 });
 
-for (const name of names) {
-  normalize.add({ name });
-}
-
-for await (const { item, output, progress } of normalize.run()) {
+for await (const { item, output, progress } of task.run()) {
   console.log(`[${progress.completed}/${progress.total}] ${item.name} → ${output}`);
 }
 ```
-
-### Structured output
-
-Pass an `output` schema and results come back parsed:
-
-```js
-const extract = new Task({
-  systemPrompt: 'Extract the person name and dollar amount from this contract clause.',
-  concurrency: 5,
-  model: 'claude-opus-4-6',
-  output: { name: 'string', amount: 'string' },
-  items: clauses,
-});
-
-for await (const { item, output } of extract.run()) {
-  db.insert({ clause_id: item.id, name: output.name, amount: output.amount });
-}
-```
-
-### Pre-loading items
-
-```js
-// pass items in the constructor
-const task = new Task({ systemPrompt: '...', items: rows });
-
-// or add them one at a time
-const task = new Task({ systemPrompt: '...' });
-for (const row of rows) {
-  task.add(row);
-}
-```
-
-## API
 
 ### `new Task(options)`
 
@@ -81,24 +80,15 @@ for (const row of rows) {
 | `systemPrompt` | `string` | — | Instructions for the agent |
 | `concurrency` | `number` | `10` | Max parallel agents |
 | `items` | `array` | `[]` | Items to pre-load into the queue |
-| `model` | `string` | — | Model name (e.g. `'claude-opus-4-6'`) |
-| `output` | `object` | — | Output schema. If set, agents return JSON and results are auto-parsed |
+| `model` | `string` | — | Model name |
 
 ### `.add(item)`
 
-Add an item to the queue. Items are plain objects — they get JSON-stringified and sent as the agent's prompt.
+Add an item to the queue.
 
 ### `.run()`
 
-Returns an async generator. Each yield:
-
-```js
-{
-  item,     // the original item
-  output,   // agent response (string, or parsed object if output schema set)
-  progress, // { completed, total }
-}
-```
+Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 
 ## Install
 

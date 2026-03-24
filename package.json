@@ -4,5 +4,8 @@
   "description": "A task queue for agentic workloads",
   "type": "module",
   "main": "index.js",
-  "exports": "./index.js"
+  "exports": "./index.js",
+  "bin": {
+    "atq": "./cli.js"
+  }
 }

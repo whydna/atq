@@ -31,6 +31,18 @@ graph LR
   A3 --> stdout
 ```
 
+## Install
+
+**CLI** (global, gives you the `atq` command):
+```
+npm install -g @endyai/atq
+```
+
+**SDK** (local, for use in your project):
+```
+npm install @endyai/atq
+```
+
 ## CLI
 
 ```bash
@@ -101,9 +113,3 @@ Add an item to the queue.
 ### `.run()`
 
 Async generator. Each yield: `{ item, output, progress: { completed, total } }`
-
-## Install
-
-```
-npm install @endyai/atq
-```

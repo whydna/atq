@@ -4,19 +4,20 @@ A task queue for agentic workloads.
 
 ## The problem
 
-You have a large batch of tasks that need to be processed using an agent (language, reasoning, tool use tasks).
+You have a large batch of tasks that need to be processed using an LLM agent (language/reasoning/tool use tasks).
 
 Running these through a single long-lived agent doesn't work:
 
+- Agents usually want to write a script to process batch tasks - rather than reason through each one.
 - **Context bloat.** The agent accumulates results from previous tasks. Gets slower, more expensive, less focused.
 - **Fragile batching.** One failure midway can stall everything. Tracking what succeeded is painful.
 - **No concurrency.** Processing items one at a time when each task is independent is just slow.
 
 ## The approach
 
-Each task gets its own fresh agent with a clean context. A pool of agents process items concurrently — one finishes, the next starts immediately.
+Isolate each with a clean context. A pool of agents process them in parallel.
 
-- **Fresh context per task.** Each agent only sees the item it's working on. Better focus, lower cost, no cross-contamination.
+- **Fresh context per task.** Each agent only sees the item it's working on. Better focus, lower cost.
 - **Concurrent by default.** Control the pool size with `concurrency`.
 - **Stream results.** Results stream to stdout as agents complete.
 

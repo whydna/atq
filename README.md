@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@endyai/atq?color=brightgreen)](https://www.npmjs.com/package/@endyai/atq)
 [![license](https://img.shields.io/npm/l/@endyai/atq)](https://github.com/whydna/atq)
 
-Batch process tasks across parallel AI agents.
+Batch process tasks using agents in parallel.
 
 ## The problem
 

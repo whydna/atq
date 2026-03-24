@@ -134,7 +134,7 @@ Output:
 ### Find CEO with web search
 
 ```bash
-cat companies.jsonl | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return just their full name."
+cat companies.jsonl | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return their full name."
 ```
 
 Input:

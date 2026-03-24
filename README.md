@@ -23,10 +23,10 @@ Each task gets its own fresh agent with a clean context. A pool of agents proces
 ## CLI
 
 ```bash
-atq -p "Normalize this company name. Return just the name." -i companies.jsonl -c 10 -m claude-sonnet-4-6
+cat companies.jsonl | atq -p "Normalize this company name. Return just the name." -c 10 -m claude-sonnet-4-6
 ```
 
-**Input** (`companies.jsonl`):
+Input is piped via stdin (one JSON object per line):
 ```jsonl
 {"name": "Google LLC"}
 {"name": "APPLE INC."}
@@ -52,7 +52,6 @@ atq -p "Normalize this company name. Return just the name." -i companies.jsonl -
 | Short | Long | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `-p` | `--prompt` | yes | — | Instructions for the agent |
-| `-i` | `--input` | yes | — | Path to JSONL file |
 | `-c` | `--concurrency` | no | `10` | Max parallel agents |
 | `-m` | `--model` | no | — | Model name |
 

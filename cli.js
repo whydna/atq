@@ -7,18 +7,17 @@ import { Task } from './index.js';
 const { values } = parseArgs({
   options: {
     prompt: { type: 'string', short: 'p' },
-    input: { type: 'string', short: 'i' },
     concurrency: { type: 'string', short: 'c' },
     model: { type: 'string', short: 'm' },
   },
 });
 
-if (!values.prompt || !values.input) {
-  console.error('Usage: atq -p "..." -i items.jsonl [-c 10] [-m model]');
+if (!values.prompt) {
+  console.error('Usage: cat items.jsonl | atq -p "..." [-c 10] [-m model]');
   process.exit(1);
 }
 
-const lines = readFileSync(values.input, 'utf8').trim().split('\n');
+const lines = readFileSync('/dev/stdin', 'utf8').trim().split('\n');
 const items = lines.map(line => JSON.parse(line));
 
 const task = new Task({

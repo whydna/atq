@@ -9,7 +9,7 @@
     "atq": "cli.js"
   },
   "scripts": {
-    "example:clean-text": "cat examples/clean-text/companies.jsonl | node cli.js -p 'Normalize this company name. Return just the name.' -c 10"
+    "example:normalize-names": "cat examples/normalize-names/companies.jsonl | node cli.js -p 'Normalize this company name. Return just the name.' -c 10"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.81"

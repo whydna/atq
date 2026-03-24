@@ -12,7 +12,7 @@ const readStdin = () => {
   });
 };
 
-const { values } = parseArgs({
+const { values, positionals } = parseArgs({
   options: {
     prompt: { type: 'string', short: 'p' },
     concurrency: { type: 'string', short: 'c' },
@@ -20,10 +20,13 @@ const { values } = parseArgs({
     'api-key': { type: 'string', short: 'k' },
     'allowed-tools': { type: 'string', short: 't' },
   },
+  allowPositionals: true,
 });
 
-if (!values.prompt) {
-  console.error('Usage: cat items.txt | atq -p "..." [-c 10] [-m model] [-k api-key] [-t tools]');
+const prompt = values.prompt || positionals[0];
+
+if (!prompt) {
+  console.error('Usage: cat items.txt | atq "prompt" [-c 10] [-m model] [-k api-key] [-t tools]');
   process.exit(1);
 }
 
@@ -31,7 +34,7 @@ const input = await readStdin();
 const items = input.trim().split('\n');
 
 const task = new Task({
-  prompt: values.prompt,
+  prompt,
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   model: values.model,
   apiKey: values['api-key'],

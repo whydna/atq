@@ -20,17 +20,6 @@ Each task gets its own fresh agent with a clean context. A pool of agents proces
 - **Concurrent by default.** Control the pool size with `concurrency`.
 - **Stream results.** Results stream to stdout as agents complete.
 
-```mermaid
-graph LR
-  stdin["stdin (JSONL)"] --> atq
-  atq --> A1[Agent 1]
-  atq --> A2[Agent 2]
-  atq --> A3[Agent N]
-  A1 --> stdout["stdout (JSONL)"]
-  A2 --> stdout
-  A3 --> stdout
-```
-
 ## CLI
 
 ```

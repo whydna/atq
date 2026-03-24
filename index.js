@@ -1,11 +1,12 @@
 import { query } from '@anthropic-ai/claude-agent-sdk';
 
 export class Task {
-  constructor({ prompt, concurrency = 10, items = [], model, apiKey }) {
+  constructor({ prompt, concurrency = 10, items = [], model, apiKey, allowedTools }) {
     this.prompt = prompt;
     this.concurrency = concurrency;
     this.model = model;
     this.apiKey = apiKey;
+    this.allowedTools = allowedTools;
     this.items = [...items];
   }
 
@@ -40,6 +41,7 @@ export class Task {
       const options = { systemPrompt: prompt };
       if (this.model) options.model = this.model;
       if (this.apiKey) options.apiKey = this.apiKey;
+      if (this.allowedTools) options.allowedTools = this.allowedTools;
       let result = '';
       for await (const msg of query({ prompt: JSON.stringify(item), options })) {
         if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;

@@ -1,17 +1,14 @@
 {
   "name": "@endyai/atq",
-  "version": "0.0.2",
-  "description": "A task queue for agentic workloads",
+  "version": "0.0.3",
+  "description": "Batch process tasks across parallel AI agents.",
   "type": "module",
   "main": "index.js",
   "exports": "./index.js",
   "bin": {
     "atq": "cli.js"
   },
-  "scripts": {
-    "example:normalize-names": "cat examples/normalize-names/companies.jsonl | node cli.js -p 'Normalize this company name. Return just the name.' -c 10"
-  },
-  "dependencies": {
+"dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.81"
   }
 }

@@ -27,24 +27,27 @@ npm install -g @endyai/atq
 ```
 
 ```bash
-cat companies.jsonl | atq -p "Normalize this company name. Return just the name." -c 10 -m claude-sonnet-4-6
+cat companies.jsonl | atq -p "Find the current CEO of this company. Return their full name." -c 10
 ```
 
 Input is piped via stdin (one JSON object per line):
+
 ```jsonl
-{"name": "Google LLC"}
-{"name": "APPLE INC."}
-{"name": "Meta Platforms, Inc."}
+{"company": "Apple"}
+{"company": "Google"}
+{"company": "Meta"}
 ```
 
 **Output** (stdout, one JSON line per completed item):
+
 ```jsonl
-{"item":{"name":"Google LLC"},"output":"Google"}
-{"item":{"name":"APPLE INC."},"output":"Apple"}
-{"item":{"name":"Meta Platforms, Inc."},"output":"Meta"}
+{"item":{"company":"Apple"},"output":"Tim Cook"}
+{"item":{"company":"Google"},"output":"Sundar Pichai"}
+{"item":{"company":"Meta"},"output":"Mark Zuckerberg"}
 ```
 
 **Progress** (stderr):
+
 ```
 [1/3]
 [2/3]
@@ -53,12 +56,15 @@ Input is piped via stdin (one JSON object per line):
 
 ### Flags
 
-| Short | Long | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `-p` | `--prompt` | yes | — | Instructions for the agent |
-| `-c` | `--concurrency` | no | `10` | Max parallel agents |
-| `-m` | `--model` | no | — | Model name |
-| `-k` | `--api-key` | no | — | Anthropic API key |
+
+| Short | Long              | Required | Default | Description                   |
+| ----- | ----------------- | -------- | ------- | ----------------------------- |
+| `-p`  | `--prompt`        | yes      | —       | Instructions for the agent    |
+| `-c`  | `--concurrency`   | no       | `10`    | Max parallel agents           |
+| `-m`  | `--model`         | no       | —       | Model name                    |
+| `-k`  | `--api-key`       | no       | —       | Anthropic API key             |
+| `-t`  | `--allowed-tools` | no       | —       | Comma-separated list of tools |
+
 
 ## SDK
 
@@ -70,26 +76,28 @@ npm install @endyai/atq
 import { Task } from '@endyai/atq';
 
 const task = new Task({
-  prompt: 'Normalize this company name. Return just the name.',
+  prompt: 'Find the current CEO of this company. Return just their full name.',
   concurrency: 10,
-  model: 'claude-sonnet-4-6',
-  items: [{ name: 'Google LLC' }, { name: 'APPLE INC.' }],
+  items: [{ company: 'Apple' }, { company: 'Google' }, { company: 'Meta' }],
 });
 
 for await (const { item, output, progress } of task.run()) {
-  console.log(`[${progress.completed}/${progress.total}] ${item.name} → ${output}`);
+  console.log(`[${progress.completed}/${progress.total}] ${item.company} → ${output}`);
 }
 ```
 
 ### `new Task(options)`
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `prompt` | `string` | — | Instructions for the agent |
-| `concurrency` | `number` | `10` | Max parallel agents |
-| `items` | `array` | `[]` | Items to pre-load into the queue |
-| `model` | `string` | — | Model name |
-| `apiKey` | `string` | — | Anthropic API key |
+
+| Option         | Type       | Default | Description                      |
+| -------------- | ---------- | ------- | -------------------------------- |
+| `prompt`       | `string`   | —       | Instructions for the agent       |
+| `concurrency`  | `number`   | `10`    | Max parallel agents              |
+| `items`        | `array`    | `[]`    | Items to pre-load into the queue |
+| `model`        | `string`   | —       | Model name                       |
+| `apiKey`       | `string`   | —       | Anthropic API key                |
+| `allowedTools` | `string[]` | —       | Tools the agent can use          |
+
 
 ### `.add(item)`
 
@@ -98,3 +106,76 @@ Add an item to the queue.
 ### `.run()`
 
 Async generator. Each yield: `{ item, output, progress: { completed, total } }`
+
+## Examples
+
+### Clean song titles
+
+```bash
+cat songs.jsonl | atq -p "Clean the song title. Remove featured artists, extra tags like (Official Video), remaster notes, etc. Return just the clean song title." -c 10
+```
+
+Input:
+
+```jsonl
+{"title": "Bohemian Rhapsody (Remastered 2011)"}
+{"title": "Blinding Lights (feat. Doja Cat) [Official Video]"}
+{"title": "Hotel California - 2013 Remaster"}
+```
+
+Output:
+
+```jsonl
+{"item":{"title":"Bohemian Rhapsody (Remastered 2011)"},"output":"Bohemian Rhapsody"}
+{"item":{"title":"Blinding Lights (feat. Doja Cat) [Official Video]"},"output":"Blinding Lights"}
+{"item":{"title":"Hotel California - 2013 Remaster"},"output":"Hotel California"}
+```
+
+### Find CEO with web search
+
+```bash
+cat companies.jsonl | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return just their full name."
+```
+
+Input:
+
+```jsonl
+{"company": "Rivian"}
+{"company": "Figma"}
+{"company": "Stripe"}
+```
+
+Output:
+
+```jsonl
+{"item":{"company":"Rivian"},"output":"RJ Scaringe"}
+{"item":{"company":"Figma"},"output":"Dylan Field"}
+{"item":{"company":"Stripe"},"output":"Patrick Collison"}
+```
+
+### Research & enrich a database
+
+```bash
+cat ids.jsonl | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at mydb.db. For the given id:
+1. Look up the company name from the companies table
+2. Search the web for their most recent funding round
+3. Download their logo and save it to ./logos/<id>.png
+4. Update the company row with last_round, amount, and logo_path"
+```
+
+Input:
+
+```jsonl
+{"id": 1}
+{"id": 2}
+{"id": 3}
+```
+
+Output:
+
+```jsonl
+{"item":{"id":1},"output":"Rippling → Series F, $200M, logo saved"}
+{"item":{"id":2},"output":"Vercel → Series E, $250M, logo saved"}
+{"item":{"id":3},"output":"Cursor → Series B, $105M, logo saved"}
+```
+

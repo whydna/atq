@@ -10,6 +10,7 @@ const { values } = parseArgs({
     concurrency: { type: 'string', short: 'c' },
     model: { type: 'string', short: 'm' },
     'api-key': { type: 'string', short: 'k' },
+    'allowed-tools': { type: 'string', short: 't' },
   },
 });
 
@@ -26,6 +27,7 @@ const task = new Task({
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   model: values.model,
   apiKey: values['api-key'],
+  allowedTools: values['allowed-tools'] ? values['allowed-tools'].split(',') : undefined,
   items,
 });
 

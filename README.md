@@ -4,7 +4,7 @@ A task queue for agentic workloads.
 
 ## The problem
 
-You have a large number of tasks that each require an AI agent — classifying records, extracting data, normalizing content — anything that needs reasoning, not just an API call.
+You have a large batch of tasks that need to be processed using an agent (language, reasoning, tool use tasks).
 
 Running these through a single long-lived agent doesn't work:
 

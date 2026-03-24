@@ -65,6 +65,7 @@ Input is piped via stdin (one JSON object per line):
 | `-p` | `--prompt` | yes | — | Instructions for the agent |
 | `-c` | `--concurrency` | no | `10` | Max parallel agents |
 | `-m` | `--model` | no | — | Model name |
+| `-k` | `--api-key` | no | — | Anthropic API key |
 
 ## SDK
 
@@ -91,6 +92,7 @@ for await (const { item, output, progress } of task.run()) {
 | `concurrency` | `number` | `10` | Max parallel agents |
 | `items` | `array` | `[]` | Items to pre-load into the queue |
 | `model` | `string` | — | Model name |
+| `apiKey` | `string` | — | Anthropic API key |
 
 ### `.add(item)`
 
@@ -102,9 +104,6 @@ Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 
 ## Install
 
-Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — each task item is processed by forking a `claude` process.
-
 ```
-npm install -g @anthropic-ai/claude-code
 npm install atq
 ```

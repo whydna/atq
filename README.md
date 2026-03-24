@@ -70,7 +70,7 @@ Input is piped via stdin (one JSON object per line):
 ## SDK
 
 ```js
-import { Task } from 'atq';
+import { Task } from '@endyai/atq';
 
 const task = new Task({
   prompt: 'Normalize this company name. Return just the name.',
@@ -105,5 +105,5 @@ Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 ## Install
 
 ```
-npm install atq
+npm install @endyai/atq
 ```

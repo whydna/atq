@@ -126,9 +126,9 @@ cat ids.txt | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at myd
 Input:
 
 ```
-1
-2
-3
+a1b2c3d4
+e5f6g7h8
+i9j0k1l2
 ```
 
 Output:

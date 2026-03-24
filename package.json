@@ -8,7 +8,8 @@
   "bin": {
     "atq": "cli.js"
   },
-"scripts": {
+"license": "MIT",
+  "scripts": {
     "test": "node --test test.js"
   },
   "dependencies": {

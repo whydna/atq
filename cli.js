@@ -21,7 +21,7 @@ const lines = readFileSync('/dev/stdin', 'utf8').trim().split('\n');
 const items = lines.map(line => JSON.parse(line));
 
 const task = new Task({
-  systemPrompt: values.prompt,
+  prompt: values.prompt,
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   model: values.model,
   items,

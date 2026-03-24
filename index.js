@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process';
 
 export class Task {
-  constructor({ systemPrompt, concurrency = 10, items = [], model }) {
-    this.systemPrompt = systemPrompt;
+  constructor({ prompt, concurrency = 10, items = [], model }) {
+    this.prompt = prompt;
     this.concurrency = concurrency;
     this.model = model;
     this.items = [...items];
@@ -16,7 +16,7 @@ export class Task {
     const total = this.items.length;
     if (total === 0) return;
 
-    const systemPrompt = this.systemPrompt || '';
+    const prompt = this.prompt || '';
 
     let completed = 0;
     let next = 0;
@@ -37,7 +37,7 @@ export class Task {
 
     const exec = (item) => new Promise((resolve) => {
       const args = ['-p', JSON.stringify(item), '--output-format', 'text'];
-      if (systemPrompt) args.push('--system-prompt', systemPrompt);
+      if (prompt) args.push('--system-prompt', prompt);
       if (this.model) args.push('--model', this.model);
       const proc = spawn('claude', args);
       let out = '';

@@ -61,7 +61,7 @@ Input is piped via stdin (one JSON object per line):
 import { Task } from 'atq';
 
 const task = new Task({
-  systemPrompt: 'Normalize this company name. Return just the name.',
+  prompt: 'Normalize this company name. Return just the name.',
   concurrency: 10,
   model: 'claude-sonnet-4-6',
   items: [{ name: 'Google LLC' }, { name: 'APPLE INC.' }],
@@ -76,7 +76,7 @@ for await (const { item, output, progress } of task.run()) {
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `systemPrompt` | `string` | — | Instructions for the agent |
+| `prompt` | `string` | — | Instructions for the agent |
 | `concurrency` | `number` | `10` | Max parallel agents |
 | `items` | `array` | `[]` | Items to pre-load into the queue |
 | `model` | `string` | — | Model name |

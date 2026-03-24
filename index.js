@@ -37,12 +37,12 @@ export class Task {
     };
 
     const exec = async (item) => {
+      const options = { systemPrompt: prompt };
+      if (this.model) options.model = this.model;
+      if (this.apiKey) options.apiKey = this.apiKey;
       let result = '';
-      const opts = { systemPrompt: prompt };
-      if (this.model) opts.model = this.model;
-      if (this.apiKey) opts.apiKey = this.apiKey;
-      for await (const msg of query(JSON.stringify(item), opts)) {
-        if (msg.type === 'text') result += msg.content;
+      for await (const msg of query({ prompt: JSON.stringify(item), options })) {
+        if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;
       }
       return result.trim();
     };

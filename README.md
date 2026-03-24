@@ -28,23 +28,23 @@ npm install -g @endyai/atq
 ```
 
 ```bash
-cat companies.jsonl | atq -p "Find the current CEO of this company. Return their full name." -c 10
+cat companies.txt | atq -p "Find the current CEO of this company. Return their full name." -c 10
 ```
 
-Input is piped via stdin (one JSON object per line):
+Input is piped via stdin (one line per item):
 
-```jsonl
-{"company": "Apple"}
-{"company": "Google"}
-{"company": "Meta"}
+```
+Apple
+Google
+Meta
 ```
 
-**Output** (stdout, one JSON line per completed item):
+**Output** (stdout, one line per item, in input order):
 
-```jsonl
-{"item":{"company":"Apple"},"output":"Tim Cook"}
-{"item":{"company":"Google"},"output":"Sundar Pichai"}
-{"item":{"company":"Meta"},"output":"Mark Zuckerberg"}
+```
+Tim Cook
+Sundar Pichai
+Mark Zuckerberg
 ```
 
 **Progress** (stderr):
@@ -113,51 +113,51 @@ Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 ### Clean song titles
 
 ```bash
-cat songs.jsonl | atq -p "Clean the song title. Remove featured artists, extra tags like (Official Video), remaster notes, etc. Return just the clean song title." -c 10
+cat songs.txt | atq -p "Clean the song title. Remove featured artists, extra tags like (Official Video), remaster notes, etc. Return just the clean song title." -c 10
 ```
 
 Input:
 
-```jsonl
-{"title": "Bohemian Rhapsody (Remastered 2011)"}
-{"title": "Blinding Lights (feat. Doja Cat) [Official Video]"}
-{"title": "Hotel California - 2013 Remaster"}
+```
+Bohemian Rhapsody (Remastered 2011)
+Blinding Lights (feat. Doja Cat) [Official Video]
+Hotel California - 2013 Remaster
 ```
 
 Output:
 
-```jsonl
-{"item":{"title":"Bohemian Rhapsody (Remastered 2011)"},"output":"Bohemian Rhapsody"}
-{"item":{"title":"Blinding Lights (feat. Doja Cat) [Official Video]"},"output":"Blinding Lights"}
-{"item":{"title":"Hotel California - 2013 Remaster"},"output":"Hotel California"}
+```
+Bohemian Rhapsody
+Blinding Lights
+Hotel California
 ```
 
 ### Find CEO with web search
 
 ```bash
-cat companies.jsonl | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return their full name."
+cat companies.txt | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return their full name."
 ```
 
 Input:
 
-```jsonl
-{"company": "Rivian"}
-{"company": "Figma"}
-{"company": "Stripe"}
+```
+Rivian
+Figma
+Stripe
 ```
 
 Output:
 
-```jsonl
-{"item":{"company":"Rivian"},"output":"RJ Scaringe"}
-{"item":{"company":"Figma"},"output":"Dylan Field"}
-{"item":{"company":"Stripe"},"output":"Patrick Collison"}
+```
+RJ Scaringe
+Dylan Field
+Patrick Collison
 ```
 
 ### Research & enrich a database
 
 ```bash
-cat ids.jsonl | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at mydb.db. For the given id:
+cat ids.txt | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at mydb.db. For the given id:
 1. Look up the company name from the companies table
 2. Search the web for their most recent funding round
 3. Download their logo and save it to ./logos/<id>.png
@@ -166,17 +166,17 @@ cat ids.jsonl | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at m
 
 Input:
 
-```jsonl
-{"id": 1}
-{"id": 2}
-{"id": 3}
+```
+1
+2
+3
 ```
 
 Output:
 
-```jsonl
-{"item":{"id":1},"output":"Rippling → Series F, $200M, logo saved"}
-{"item":{"id":2},"output":"Vercel → Series E, $250M, logo saved"}
-{"item":{"id":3},"output":"Cursor → Series B, $105M, logo saved"}
+```
+Rippling → Series F, $200M, logo saved
+Vercel → Series E, $250M, logo saved
+Cursor → Series B, $105M, logo saved
 ```
 

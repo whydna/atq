@@ -15,12 +15,12 @@ const { values } = parseArgs({
 });
 
 if (!values.prompt) {
-  console.error('Usage: cat items.jsonl | atq -p "..." [-c 10] [-m model] [-k api-key]');
+  console.error('Usage: cat items.txt | atq -p "..." [-c 10] [-m model] [-k api-key] [-t tools]');
   process.exit(1);
 }
 
 const lines = readFileSync('/dev/stdin', 'utf8').trim().split('\n');
-const items = lines.map(line => JSON.parse(line));
+const items = lines;
 
 const task = new Task({
   prompt: values.prompt,
@@ -31,7 +31,7 @@ const task = new Task({
   items,
 });
 
-for await (const { item, output, progress } of task.run()) {
+for await (const { output, progress } of task.run()) {
   process.stderr.write(`[${progress.completed}/${progress.total}]\n`);
-  console.log(JSON.stringify({ item, output }));
+  console.log(output);
 }

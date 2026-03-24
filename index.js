@@ -23,13 +23,20 @@ export class Task {
     let completed = 0;
     let next = 0;
     let running = 0;
+    let nextEmit = 0;
 
+    const results = new Map();
     const buffer = [];
     let waiting = null;
 
-    const push = (result) => {
-      if (waiting) { const r = waiting; waiting = null; r(result); }
-      else buffer.push(result);
+    const tryFlush = () => {
+      while (results.has(nextEmit)) {
+        const result = results.get(nextEmit);
+        results.delete(nextEmit);
+        nextEmit++;
+        if (waiting) { const r = waiting; waiting = null; r(result); }
+        else buffer.push(result);
+      }
     };
 
     const pull = () => {
@@ -43,7 +50,7 @@ export class Task {
       if (this.apiKey) options.apiKey = this.apiKey;
       if (this.allowedTools) options.allowedTools = this.allowedTools;
       let result = '';
-      for await (const msg of query({ prompt: JSON.stringify(item), options })) {
+      for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
         if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;
       }
       return result.trim();
@@ -51,12 +58,14 @@ export class Task {
 
     const fill = () => {
       while (next < total && running < this.concurrency) {
+        const idx = next;
         const item = this.items[next++];
         running++;
         exec(item).then(raw => {
           running--;
           completed++;
-          push({ item, output: raw, progress: { completed, total } });
+          results.set(idx, { item, output: raw, progress: { completed, total } });
+          tryFlush();
           fill();
         });
       }
@@ -64,7 +73,7 @@ export class Task {
 
     fill();
 
-    while (completed < total || buffer.length > 0) {
+    while (nextEmit < total || buffer.length > 0) {
       yield await pull();
     }
   }

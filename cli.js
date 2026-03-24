@@ -9,11 +9,12 @@ const { values } = parseArgs({
     prompt: { type: 'string', short: 'p' },
     concurrency: { type: 'string', short: 'c' },
     model: { type: 'string', short: 'm' },
+    'api-key': { type: 'string', short: 'k' },
   },
 });
 
 if (!values.prompt) {
-  console.error('Usage: cat items.jsonl | atq -p "..." [-c 10] [-m model]');
+  console.error('Usage: cat items.jsonl | atq -p "..." [-c 10] [-m model] [-k api-key]');
   process.exit(1);
 }
 
@@ -24,6 +25,7 @@ const task = new Task({
   prompt: values.prompt,
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   model: values.model,
+  apiKey: values['api-key'],
   items,
 });
 

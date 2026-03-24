@@ -1,10 +1,11 @@
-import { spawn } from 'node:child_process';
+import { query } from '@anthropic-ai/claude-agent-sdk';
 
 export class Task {
-  constructor({ prompt, concurrency = 10, items = [], model }) {
+  constructor({ prompt, concurrency = 10, items = [], model, apiKey }) {
     this.prompt = prompt;
     this.concurrency = concurrency;
     this.model = model;
+    this.apiKey = apiKey;
     this.items = [...items];
   }
 
@@ -35,15 +36,16 @@ export class Task {
       return new Promise(r => { waiting = r; });
     };
 
-    const exec = (item) => new Promise((resolve) => {
-      const args = ['-p', JSON.stringify(item), '--output-format', 'text'];
-      if (prompt) args.push('--system-prompt', prompt);
-      if (this.model) args.push('--model', this.model);
-      const proc = spawn('claude', args);
-      let out = '';
-      proc.stdout.on('data', d => { out += d; });
-      proc.on('close', () => resolve(out.trim()));
-    });
+    const exec = async (item) => {
+      let result = '';
+      const opts = { systemPrompt: prompt };
+      if (this.model) opts.model = this.model;
+      if (this.apiKey) opts.apiKey = this.apiKey;
+      for await (const msg of query(JSON.stringify(item), opts)) {
+        if (msg.type === 'text') result += msg.content;
+      }
+      return result.trim();
+    };
 
     const fill = () => {
       while (next < total && running < this.concurrency) {

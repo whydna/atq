@@ -1,0 +1,8 @@
+{
+  "name": "atq",
+  "version": "0.0.1",
+  "description": "A task queue for agentic workloads",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js"
+}

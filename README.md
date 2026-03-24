@@ -31,19 +31,11 @@ graph LR
   A3 --> stdout
 ```
 
-## Install
+## CLI
 
-**CLI** (global, gives you the `atq` command):
 ```
 npm install -g @endyai/atq
 ```
-
-**SDK** (local, for use in your project):
-```
-npm install @endyai/atq
-```
-
-## CLI
 
 ```bash
 cat companies.jsonl | atq -p "Normalize this company name. Return just the name." -c 10 -m claude-sonnet-4-6
@@ -80,6 +72,10 @@ Input is piped via stdin (one JSON object per line):
 | `-k` | `--api-key` | no | — | Anthropic API key |
 
 ## SDK
+
+```
+npm install @endyai/atq
+```
 
 ```js
 import { Task } from '@endyai/atq';

@@ -1,8 +1,16 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { Task } from './index.js';
+
+const readStdin = () => {
+  return new Promise((resolve) => {
+    let data = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', chunk => data += chunk);
+    process.stdin.on('end', () => resolve(data));
+  });
+};
 
 const { values } = parseArgs({
   options: {
@@ -19,8 +27,8 @@ if (!values.prompt) {
   process.exit(1);
 }
 
-const lines = readFileSync('/dev/stdin', 'utf8').trim().split('\n');
-const items = lines;
+const input = await readStdin();
+const items = input.trim().split('\n');
 
 const task = new Task({
   prompt: values.prompt,

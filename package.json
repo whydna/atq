@@ -8,7 +8,10 @@
   "bin": {
     "atq": "cli.js"
   },
-"dependencies": {
+"scripts": {
+    "test": "node --test test.js"
+  },
+  "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.81"
   }
 }

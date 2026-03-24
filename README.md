@@ -66,7 +66,7 @@ Input is piped via stdin (one JSON object per line):
 | `-c` | `--concurrency` | no | `10` | Max parallel agents |
 | `-m` | `--model` | no | — | Model name |
 
-## Library
+## SDK
 
 ```js
 import { Task } from 'atq';

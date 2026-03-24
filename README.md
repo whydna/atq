@@ -67,47 +67,6 @@ Mark Zuckerberg
 | `-t`  | `--allowed-tools` | no       | —       | Comma-separated list of tools |
 
 
-## SDK
-
-```
-npm install @endyai/atq
-```
-
-```js
-import { Task } from '@endyai/atq';
-
-const task = new Task({
-  prompt: 'Find the current CEO of this company. Return just their full name.',
-  concurrency: 10,
-  items: [{ company: 'Apple' }, { company: 'Google' }, { company: 'Meta' }],
-});
-
-for await (const { item, output, progress } of task.run()) {
-  console.log(`[${progress.completed}/${progress.total}] ${item.company} → ${output}`);
-}
-```
-
-### `new Task(options)`
-
-
-| Option         | Type       | Default | Description                      |
-| -------------- | ---------- | ------- | -------------------------------- |
-| `prompt`       | `string`   | —       | Instructions for the agent       |
-| `concurrency`  | `number`   | `10`    | Max parallel agents              |
-| `items`        | `array`    | `[]`    | Items to pre-load into the queue |
-| `model`        | `string`   | —       | Model name                       |
-| `apiKey`       | `string`   | —       | Anthropic API key                |
-| `allowedTools` | `string[]` | —       | Tools the agent can use          |
-
-
-### `.add(item)`
-
-Add an item to the queue.
-
-### `.run()`
-
-Async generator. Each yield: `{ item, output, progress: { completed, total } }`
-
 ## Examples
 
 ### Clean song titles
@@ -179,4 +138,41 @@ Rippling → Series F, $200M, logo saved
 Vercel → Series E, $250M, logo saved
 Cursor → Series B, $105M, logo saved
 ```
+
+## SDK
+
+If you need to run atq programmatically from your own code:
+
+```
+npm install @endyai/atq
+```
+
+```js
+import { Task } from '@endyai/atq';
+
+const task = new Task({
+  prompt: 'Find the current CEO of this company. Return their full name.',
+  concurrency: 10,
+  items: ['Apple', 'Google', 'Meta'],
+});
+
+for await (const { item, output, progress } of task.run()) {
+  console.log(`[${progress.completed}/${progress.total}] ${item} → ${output}`);
+}
+```
+
+### `new Task(options)`
+
+| Option         | Type       | Default | Description                      |
+| -------------- | ---------- | ------- | -------------------------------- |
+| `prompt`       | `string`   | —       | Instructions for the agent       |
+| `concurrency`  | `number`   | `10`    | Max parallel agents              |
+| `items`        | `array`    | `[]`    | Items to process                 |
+| `model`        | `string`   | —       | Model name                       |
+| `apiKey`       | `string`   | —       | Anthropic API key                |
+| `allowedTools` | `string[]` | —       | Tools the agent can use          |
+
+### `.run()`
+
+Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 

@@ -102,6 +102,9 @@ Async generator. Each yield: `{ item, output, progress: { completed, total } }`
 
 ## Install
 
+Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — each task item is processed by forking a `claude` process.
+
 ```
+npm install -g @anthropic-ai/claude-code
 npm install atq
 ```

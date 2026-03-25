@@ -14,6 +14,7 @@ const readStdin = () => {
 
 const { values, positionals } = parseArgs({
   options: {
+    help: { type: 'boolean', short: 'h' },
     prompt: { type: 'string', short: 'p' },
     concurrency: { type: 'string', short: 'c' },
     model: { type: 'string', short: 'm' },
@@ -22,6 +23,25 @@ const { values, positionals } = parseArgs({
   },
   allowPositionals: true,
 });
+
+if (values.help) {
+  console.log(`atq — Batch process tasks across parallel AI agents.
+
+Usage:
+  cat items.txt | atq "prompt" [options]
+
+Options:
+  -p, --prompt <text>         System prompt for each agent
+  -c, --concurrency <n>       Max parallel agents (default: 10)
+  -m, --model <model>         Model to use
+  -k, --api-key <key>         Anthropic API key
+  -t, --allowed-tools <list>  Comma-separated list of allowed tools
+  -h, --help                  Show this help message
+
+Each line of stdin is processed by its own agent. Output is printed in
+the same order as input, one result per line.`);
+  process.exit(0);
+}
 
 const prompt = values.prompt || positionals[0];
 

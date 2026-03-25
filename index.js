@@ -45,10 +45,14 @@ export class Task {
     };
 
     const exec = async (item) => {
-      const options = { systemPrompt: prompt };
+      const options = {
+        systemPrompt: prompt,
+        permissionMode: 'bypassPermissions',
+        allowDangerouslySkipPermissions: true,
+      };
       if (this.model) options.model = this.model;
       if (this.apiKey) options.apiKey = this.apiKey;
-      if (this.allowedTools) options.allowedTools = this.allowedTools;
+      options.allowedTools = this.allowedTools || ['*'];
       let result = '';
       for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
         if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;

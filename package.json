@@ -1,6 +1,6 @@
 {
   "name": "@endyai/atq",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Batch process tasks across parallel AI agents.",
   "type": "module",
   "main": "index.js",
@@ -8,7 +8,7 @@
   "bin": {
     "atq": "cli.js"
   },
-"license": "MIT",
+  "license": "MIT",
   "scripts": {
     "test": "node --test test.js"
   },

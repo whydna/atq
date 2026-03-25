@@ -12,17 +12,23 @@ const readStdin = () => {
   });
 };
 
-const { values, positionals } = parseArgs({
-  options: {
-    help: { type: 'boolean', short: 'h' },
-    prompt: { type: 'string', short: 'p' },
-    concurrency: { type: 'string', short: 'c' },
-    model: { type: 'string', short: 'm' },
-    'api-key': { type: 'string', short: 'k' },
-    'allowed-tools': { type: 'string', short: 't' },
-  },
-  allowPositionals: true,
-});
+let values, positionals;
+try {
+  ({ values, positionals } = parseArgs({
+    options: {
+      help: { type: 'boolean', short: 'h' },
+      prompt: { type: 'string', short: 'p' },
+      concurrency: { type: 'string', short: 'c' },
+      model: { type: 'string', short: 'm' },
+      'api-key': { type: 'string', short: 'k' },
+      'allowed-tools': { type: 'string', short: 't' },
+    },
+    allowPositionals: true,
+  }));
+} catch (e) {
+  console.error(`atq: ${e.message}`);
+  process.exit(1);
+}
 
 if (values.help) {
   console.log(`atq — Batch process tasks across parallel AI agents.

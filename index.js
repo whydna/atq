@@ -1,9 +1,10 @@
 import { query } from '@anthropic-ai/claude-agent-sdk';
 
 export class Task {
-  constructor({ prompt, concurrency = 10, items = [], model, apiKey, allowedTools }) {
+  constructor({ prompt, concurrency = 10, retries = 3, items = [], model, apiKey, allowedTools }) {
     this.prompt = prompt;
     this.concurrency = concurrency;
+    this.retries = retries;
     this.model = model;
     this.apiKey = apiKey;
     this.allowedTools = allowedTools;
@@ -44,20 +45,31 @@ export class Task {
       return new Promise(r => { waiting = r; });
     };
 
-    const exec = async (item) => {
-      const options = {
-        systemPrompt: prompt,
-        permissionMode: 'bypassPermissions',
-        allowDangerouslySkipPermissions: true,
-      };
-      if (this.model) options.model = this.model;
-      if (this.apiKey) options.apiKey = this.apiKey;
-      options.allowedTools = this.allowedTools || ['*'];
-      let result = '';
-      for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
-        if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;
+    const exec = async (item, retries = this.retries) => {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          const options = {
+            systemPrompt: prompt,
+            permissionMode: 'bypassPermissions',
+            allowDangerouslySkipPermissions: true,
+          };
+          if (this.model) options.model = this.model;
+          if (this.apiKey) options.apiKey = this.apiKey;
+          options.allowedTools = this.allowedTools || ['*'];
+          let result = '';
+          for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
+            if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;
+          }
+          return result.trim();
+        } catch (e) {
+          if (attempt < retries) {
+            const delay = 1000 * 2 ** attempt;
+            await new Promise(r => setTimeout(r, delay));
+          } else {
+            throw e;
+          }
+        }
       }
-      return result.trim();
     };
 
     const fill = () => {
@@ -69,6 +81,12 @@ export class Task {
           running--;
           completed++;
           results.set(idx, { item, output: raw, progress: { completed, total } });
+          tryFlush();
+          fill();
+        }).catch(e => {
+          running--;
+          completed++;
+          results.set(idx, { item, output: `ERROR: ${e.message}`, progress: { completed, total } });
           tryFlush();
           fill();
         });

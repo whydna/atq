@@ -21,6 +21,7 @@ try {
       concurrency: { type: 'string', short: 'c' },
       model: { type: 'string', short: 'm' },
       'api-key': { type: 'string', short: 'k' },
+      retries: { type: 'string', short: 'r' },
       'allowed-tools': { type: 'string', short: 't' },
     },
     allowPositionals: true,
@@ -41,6 +42,7 @@ Options:
   -c, --concurrency <n>       Max parallel agents (default: 10)
   -m, --model <model>         Model to use
   -k, --api-key <key>         Anthropic API key
+  -r, --retries <n>           Max retries per item on failure (default: 3)
   -t, --allowed-tools <list>  Comma-separated list of allowed tools
   -h, --help                  Show this help message
 
@@ -62,6 +64,7 @@ const items = input.trim().split('\n');
 const task = new Task({
   prompt,
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
+  retries: values.retries ? parseInt(values.retries) : undefined,
   model: values.model,
   apiKey: values['api-key'],
   allowedTools: values['allowed-tools'] ? values['allowed-tools'].split(',') : undefined,

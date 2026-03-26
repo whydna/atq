@@ -63,11 +63,15 @@ Mark Zuckerberg
 
 | Short | Long              | Required | Default | Description                   |
 | ----- | ----------------- | -------- | ------- | ----------------------------- |
-| `-p`  | `--prompt`        | yes      | —       | Instructions for the agent    |
+| `-p`  | `--prompt`        | yes*     | —       | Instructions for the agent    |
+| `-f`  | `--prompt-file`   | yes*     | —       | Read prompt from a file       |
 | `-c`  | `--concurrency`   | no       | `10`    | Max parallel agents           |
+| `-r`  | `--retries`       | no       | `3`     | Max retries per failed item   |
 | `-m`  | `--model`         | no       | —       | Model name                    |
 | `-k`  | `--api-key`       | no       | —       | Anthropic API key             |
 | `-t`  | `--allowed-tools` | no       | —       | Comma-separated list of tools |
+
+\* Provide prompt via `--prompt`, `--prompt-file`, or as a positional argument.
 
 
 ## Examples
@@ -170,6 +174,7 @@ for await (const { item, output, progress } of task.run()) {
 | -------------- | ---------- | ------- | -------------------------------- |
 | `prompt`       | `string`   | —       | Instructions for the agent       |
 | `concurrency`  | `number`   | `10`    | Max parallel agents              |
+| `retries`      | `number`   | `3`     | Max retries per failed item      |
 | `items`        | `array`    | `[]`    | Items to process                 |
 | `model`        | `string`   | —       | Model name                       |
 | `apiKey`       | `string`   | —       | Anthropic API key                |

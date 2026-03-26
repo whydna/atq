@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { readFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
 import { Task } from './index.js';
 
@@ -18,6 +19,7 @@ try {
     options: {
       help: { type: 'boolean', short: 'h' },
       prompt: { type: 'string', short: 'p' },
+      'prompt-file': { type: 'string', short: 'f' },
       concurrency: { type: 'string', short: 'c' },
       model: { type: 'string', short: 'm' },
       'api-key': { type: 'string', short: 'k' },
@@ -39,6 +41,7 @@ Usage:
 
 Options:
   -p, --prompt <text>         System prompt for each agent
+  -f, --prompt-file <path>    Read system prompt from a file
   -c, --concurrency <n>       Max parallel agents (default: 10)
   -m, --model <model>         Model to use
   -k, --api-key <key>         Anthropic API key
@@ -51,7 +54,7 @@ the same order as input, one result per line.`);
   process.exit(0);
 }
 
-const prompt = values.prompt || positionals[0];
+const prompt = values.prompt || (values['prompt-file'] ? readFileSync(values['prompt-file'], 'utf8').trim() : null) || positionals[0];
 
 if (!prompt) {
   console.error('Usage: cat items.txt | atq "prompt" [-c 10] [-m model] [-k api-key] [-t tools]');

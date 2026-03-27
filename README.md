@@ -64,7 +64,7 @@ Mark Zuckerberg
 | ----- | ----------------- | -------- | -------------------- | ----------------------------------------------------- |
 | `-f`  | `--prompt-file`   | —        | —                    | Read prompt from a file                               |
 | `-c`  | `--concurrency`   | no       | `10`                 | Max parallel agents                                   |
-| `-p`  | `--provider`      | no       | `claude`             | Provider: `claude` or `openai`                        |
+| `-p`  | `--provider`      | no       | `anthropic`             | Provider: `anthropic` or `openai`                        |
 | `-m`  | `--model`         | no       | per provider         | Model name                                            |
 | `-k`  | `--api-key`       | no       | —                    | API key (or set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) |
 | `-r`  | `--retries`       | no       | `3`                  | Max retries per failed item (exponential backoff)     |
@@ -75,11 +75,11 @@ Prompt is passed as a positional argument or via `--prompt-file`.
 
 ### Providers
 
-Supports **Claude** (Anthropic) and **OpenAI** agents. Set with `--provider` or it defaults to `claude`.
+Supports **Anthropic** and **OpenAI** agents. Set with `--provider` or it defaults to `anthropic`.
 
 | Provider | Default model        | SDK                          |
 | -------- | -------------------- | ---------------------------- |
-| `claude` | `claude-sonnet-4-6`  | `@anthropic-ai/claude-agent-sdk` |
+| `anthropic` | `claude-sonnet-4-6`  | `@anthropic-ai/claude-agent-sdk` |
 | `openai` | `gpt-5.4`           | `@openai/agents`             |
 
 

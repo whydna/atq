@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert';
 import { Task } from './index.js';
 
-const providers = ['claude', 'openai'];
+const providers = ['anthropic', 'openai'];
 
 for (const provider of providers) {
   test(`[${provider}] single item returns a result`, async () => {

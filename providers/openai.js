@@ -17,6 +17,8 @@ const localShell = {
 };
 
 export async function* run(item, { systemPrompt, model, apiKey, allowedTools }) {
+  if (apiKey) process.env.OPENAI_API_KEY = apiKey;
+
   const agent = new Agent({
     name: 'atq-worker',
     instructions: systemPrompt || '',

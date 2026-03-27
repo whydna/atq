@@ -43,7 +43,7 @@ Usage:
 Options:
   -f, --prompt-file <path>    Read prompt from a file
   -c, --concurrency <n>       Max parallel agents (default: 10)
-  -p, --provider <name>       Provider: claude or openai (default: claude)
+  -p, --provider <name>       Provider: anthropic or openai (default: anthropic)
   -m, --model <model>         Model to use (default: per provider)
   -k, --api-key <key>         API key
   -r, --retries <n>           Max retries per item on failure (default: 3)
@@ -71,7 +71,7 @@ const task = new Task({
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   retries: values.retries ? parseInt(values.retries) : undefined,
   verbose: values.verbose || false,
-  provider: values.provider || 'claude',
+  provider: values.provider || 'anthropic',
   model: values.model,
   apiKey: values['api-key'],
   allowedTools: values['allowed-tools'] ? values['allowed-tools'].split(',') : undefined,

@@ -1,16 +1,16 @@
 const MODEL_DEFAULTS = {
-  claude: 'claude-sonnet-4-6',
+  anthropic: 'claude-sonnet-4-6',
   openai: 'gpt-5.4',
 };
 
 export class Task {
-  constructor({ prompt, concurrency = 10, retries = 3, verbose = false, provider = 'claude', items = [], model, apiKey, allowedTools }) {
+  constructor({ prompt, concurrency = 10, retries = 3, verbose = false, provider = 'anthropic', items = [], model, apiKey, allowedTools }) {
     this.prompt = prompt;
     this.concurrency = concurrency;
     this.retries = retries;
     this.verbose = verbose;
     this.provider = provider;
-    this.model = model || MODEL_DEFAULTS[provider] || MODEL_DEFAULTS.claude;
+    this.model = model || MODEL_DEFAULTS[provider] || MODEL_DEFAULTS.anthropic;
     this.apiKey = apiKey;
     this.allowedTools = allowedTools;
     this.items = [...items];

@@ -31,7 +31,7 @@ npm install -g @endyai/atq
 ```
 
 ```bash
-cat companies.txt | atq -p "Find the current CEO of this company. Return their full name." -c 10
+cat companies.txt | atq "Find the current CEO of this company. Return their full name." -c 10
 ```
 
 Input is piped via stdin (one line per item):
@@ -60,18 +60,27 @@ Mark Zuckerberg
 
 ### Flags
 
+| Short | Long              | Required | Default              | Description                                           |
+| ----- | ----------------- | -------- | -------------------- | ----------------------------------------------------- |
+| `-f`  | `--prompt-file`   | —        | —                    | Read prompt from a file                               |
+| `-c`  | `--concurrency`   | no       | `10`                 | Max parallel agents                                   |
+| `-p`  | `--provider`      | no       | `claude`             | Provider: `claude` or `openai`                        |
+| `-m`  | `--model`         | no       | per provider         | Model name                                            |
+| `-k`  | `--api-key`       | no       | —                    | API key (or set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) |
+| `-r`  | `--retries`       | no       | `3`                  | Max retries per failed item (exponential backoff)     |
+| `-v`  | `--verbose`       | no       | —                    | Print agent messages to stderr                        |
+| `-t`  | `--allowed-tools` | no       | —                    | Comma-separated list of tools                         |
 
-| Short | Long              | Required | Default | Description                   |
-| ----- | ----------------- | -------- | ------- | ----------------------------- |
-| `-p`  | `--prompt`        | yes*     | —       | Instructions for the agent    |
-| `-f`  | `--prompt-file`   | yes*     | —       | Read prompt from a file       |
-| `-c`  | `--concurrency`   | no       | `10`    | Max parallel agents           |
-| `-r`  | `--retries`       | no       | `3`     | Max retries per failed item   |
-| `-m`  | `--model`         | no       | —       | Model name                    |
-| `-k`  | `--api-key`       | no       | —       | Anthropic API key             |
-| `-t`  | `--allowed-tools` | no       | —       | Comma-separated list of tools |
+Prompt is passed as a positional argument or via `--prompt-file`.
 
-\* Provide prompt via `--prompt`, `--prompt-file`, or as a positional argument.
+### Providers
+
+Supports **Claude** (Anthropic) and **OpenAI** agents. Set with `--provider` or it defaults to `claude`.
+
+| Provider | Default model        | SDK                          |
+| -------- | -------------------- | ---------------------------- |
+| `claude` | `claude-sonnet-4-6`  | `@anthropic-ai/claude-agent-sdk` |
+| `openai` | `gpt-5.4`           | `@openai/agents`             |
 
 
 ## Examples
@@ -79,7 +88,7 @@ Mark Zuckerberg
 ### Clean song titles
 
 ```bash
-cat songs.txt | atq -p "Clean the song title. Remove featured artists, extra tags like (Official Video), remaster notes, etc. Return just the clean song title." -c 10
+cat songs.txt | atq "Clean the song title. Remove featured artists, extra tags like (Official Video), remaster notes, etc. Return just the clean song title." -c 10
 ```
 
 Input:
@@ -101,7 +110,7 @@ Hotel California
 ### Find CEO with web search
 
 ```bash
-cat companies.txt | atq -c 5 --allowed-tools WebSearch -p "Find the current CEO of this company. Return their full name."
+cat companies.txt | atq "Find the current CEO of this company. Return their full name." -c 5 -t WebSearch
 ```
 
 Input:
@@ -123,11 +132,11 @@ Patrick Collison
 ### Research & enrich a database
 
 ```bash
-cat ids.txt | atq -c 5 --allowed-tools WebSearch -p "You have a sqlite db at mydb.db. For the given id:
+cat ids.txt | atq "You have a sqlite db at mydb.db. For the given id:
 1. Look up the company name from the companies table
 2. Search the web for their most recent funding round
 3. Download their logo and save it to ./logos/<id>.png
-4. Update the company row with last_round, amount, and logo_path"
+4. Update the company row with last_round, amount, and logo_path" -c 5 -t WebSearch
 ```
 
 Input:
@@ -170,15 +179,17 @@ for await (const { item, output, progress } of task.run()) {
 
 ### `new Task(options)`
 
-| Option         | Type       | Default | Description                      |
-| -------------- | ---------- | ------- | -------------------------------- |
-| `prompt`       | `string`   | —       | Instructions for the agent       |
-| `concurrency`  | `number`   | `10`    | Max parallel agents              |
-| `retries`      | `number`   | `3`     | Max retries per failed item      |
-| `items`        | `array`    | `[]`    | Items to process                 |
-| `model`        | `string`   | —       | Model name                       |
-| `apiKey`       | `string`   | —       | Anthropic API key                |
-| `allowedTools` | `string[]` | —       | Tools the agent can use          |
+| Option         | Type       | Default              | Description                      |
+| -------------- | ---------- | -------------------- | -------------------------------- |
+| `prompt`       | `string`   | —                    | Instructions for the agent       |
+| `concurrency`  | `number`   | `10`                 | Max parallel agents              |
+| `retries`      | `number`   | `3`                  | Max retries per failed item      |
+| `verbose`      | `boolean`  | `false`              | Print agent messages to stderr   |
+| `provider`     | `string`   | `'claude'`           | `'claude'` or `'openai'`        |
+| `items`        | `array`    | `[]`                 | Items to process                 |
+| `model`        | `string`   | per provider         | Model name                       |
+| `apiKey`       | `string`   | —                    | API key for the provider         |
+| `allowedTools` | `string[]` | —                    | Tools the agent can use          |
 
 ### `.run()`
 

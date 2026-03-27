@@ -18,14 +18,13 @@ try {
   ({ values, positionals } = parseArgs({
     options: {
       help: { type: 'boolean', short: 'h' },
-      prompt: { type: 'string', short: 'p' },
       'prompt-file': { type: 'string', short: 'f' },
       concurrency: { type: 'string', short: 'c' },
+      provider: { type: 'string', short: 'p' },
       model: { type: 'string', short: 'm' },
       'api-key': { type: 'string', short: 'k' },
       retries: { type: 'string', short: 'r' },
       verbose: { type: 'boolean', short: 'v' },
-      provider: { type: 'string', short: 'P' },
       'allowed-tools': { type: 'string', short: 't' },
     },
     allowPositionals: true,
@@ -42,14 +41,13 @@ Usage:
   cat items.txt | atq "prompt" [options]
 
 Options:
-  -p, --prompt <text>         System prompt for each agent
-  -f, --prompt-file <path>    Read system prompt from a file
+  -f, --prompt-file <path>    Read prompt from a file
   -c, --concurrency <n>       Max parallel agents (default: 10)
-  -P, --provider <name>       Provider: claude or openai (default: claude)
+  -p, --provider <name>       Provider: claude or openai (default: claude)
   -m, --model <model>         Model to use (default: per provider)
   -k, --api-key <key>         API key
   -r, --retries <n>           Max retries per item on failure (default: 3)
-  -v, --verbose               Print all agent messages to stderr
+  -v, --verbose               Print agent messages to stderr
   -t, --allowed-tools <list>  Comma-separated list of allowed tools
   -h, --help                  Show this help message
 
@@ -58,7 +56,7 @@ the same order as input, one result per line.`);
   process.exit(0);
 }
 
-const prompt = values.prompt || (values['prompt-file'] ? readFileSync(values['prompt-file'], 'utf8').trim() : null) || positionals[0];
+const prompt = positionals[0] || (values['prompt-file'] ? readFileSync(values['prompt-file'], 'utf8').trim() : null);
 
 if (!prompt) {
   console.error('Usage: cat items.txt | atq "prompt" [-c 10] [-m model] [-k api-key] [-t tools]');

@@ -25,6 +25,7 @@ try {
       'api-key': { type: 'string', short: 'k' },
       retries: { type: 'string', short: 'r' },
       verbose: { type: 'boolean', short: 'v' },
+      provider: { type: 'string', short: 'P' },
       'allowed-tools': { type: 'string', short: 't' },
     },
     allowPositionals: true,
@@ -44,8 +45,9 @@ Options:
   -p, --prompt <text>         System prompt for each agent
   -f, --prompt-file <path>    Read system prompt from a file
   -c, --concurrency <n>       Max parallel agents (default: 10)
-  -m, --model <model>         Model to use (default: claude-sonnet-4-6)
-  -k, --api-key <key>         Anthropic API key
+  -P, --provider <name>       Provider: claude or openai (default: claude)
+  -m, --model <model>         Model to use (default: per provider)
+  -k, --api-key <key>         API key
   -r, --retries <n>           Max retries per item on failure (default: 3)
   -v, --verbose               Print all agent messages to stderr
   -t, --allowed-tools <list>  Comma-separated list of allowed tools
@@ -71,6 +73,7 @@ const task = new Task({
   concurrency: values.concurrency ? parseInt(values.concurrency) : 10,
   retries: values.retries ? parseInt(values.retries) : undefined,
   verbose: values.verbose || false,
+  provider: values.provider || 'claude',
   model: values.model,
   apiKey: values['api-key'],
   allowedTools: values['allowed-tools'] ? values['allowed-tools'].split(',') : undefined,

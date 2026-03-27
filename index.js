@@ -1,12 +1,16 @@
-import { query } from '@anthropic-ai/claude-agent-sdk';
+const MODEL_DEFAULTS = {
+  claude: 'claude-sonnet-4-6',
+  openai: 'gpt-5.4',
+};
 
 export class Task {
-  constructor({ prompt, concurrency = 10, retries = 3, verbose = false, items = [], model = 'claude-sonnet-4-6', apiKey, allowedTools }) {
+  constructor({ prompt, concurrency = 10, retries = 3, verbose = false, provider = 'claude', items = [], model, apiKey, allowedTools }) {
     this.prompt = prompt;
     this.concurrency = concurrency;
     this.retries = retries;
     this.verbose = verbose;
-    this.model = model;
+    this.provider = provider;
+    this.model = model || MODEL_DEFAULTS[provider] || MODEL_DEFAULTS.claude;
     this.apiKey = apiKey;
     this.allowedTools = allowedTools;
     this.items = [...items];
@@ -20,6 +24,7 @@ export class Task {
     const total = this.items.length;
     if (total === 0) return;
 
+    const { run: providerRun } = await import(`./providers/${this.provider}.js`);
     const prompt = this.prompt || '';
 
     let completed = 0;
@@ -50,26 +55,12 @@ export class Task {
       const retries = this.retries;
       for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-          const options = {
-            systemPrompt: prompt,
-            permissionMode: 'bypassPermissions',
-            allowDangerouslySkipPermissions: true,
-          };
-          options.model = this.model;
-          if (this.apiKey) options.apiKey = this.apiKey;
-          options.allowedTools = this.allowedTools || ['*'];
           let result = '';
-          for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
+          for await (const msg of providerRun(item, { systemPrompt: prompt, model: this.model, apiKey: this.apiKey, allowedTools: this.allowedTools })) {
             if (this.verbose) {
-              const m = msg.message;
-              if (msg.type === 'assistant' && m?.content) {
-                for (const block of m.content) {
-                  if (block.type === 'text') process.stderr.write(`[${idx}] ${block.text}\n`);
-                  if (block.type === 'tool_use') process.stderr.write(`[${idx}] tool: ${block.name}(${JSON.stringify(block.input).slice(0, 200)})\n`);
-                }
-              } else if (msg.type === 'result') {
-                process.stderr.write(`[${idx}] result: ${msg.subtype}\n`);
-              }
+              if (msg.type === 'text') process.stderr.write(`[${idx}] ${msg.text}\n`);
+              if (msg.type === 'tool_use') process.stderr.write(`[${idx}] tool: ${msg.name}(${JSON.stringify(msg.input).slice(0, 200)})\n`);
+              if (msg.type === 'result') process.stderr.write(`[${idx}] result: ${msg.subtype}\n`);
             }
             if (msg.type === 'result' && msg.subtype === 'success') result = msg.result;
           }

@@ -7,9 +7,9 @@ const localShell = {
     for (const cmd of action.commands) {
       try {
         const stdout = execSync(cmd, { encoding: 'utf8', timeout: action.timeoutMs || 30000 });
-        output.push({ type: 'text', text: stdout });
+        output.push({ stdout, stderr: '', outcome: { type: 'exit', exitCode: 0 } });
       } catch (e) {
-        output.push({ type: 'text', text: e.stderr || e.message });
+        output.push({ stdout: e.stdout || '', stderr: e.stderr || e.message, outcome: { type: 'exit', exitCode: e.status || 1 } });
       }
     }
     return { output };

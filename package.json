@@ -1,6 +1,6 @@
 {
   "name": "@endyai/atq",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "Batch process tasks across parallel AI agents.",
   "type": "module",
   "main": "index.js",

@@ -6,8 +6,8 @@ export async function* run(item, { systemPrompt, model, apiKey, allowedTools }) 
     model,
     permissionMode: 'bypassPermissions',
     allowDangerouslySkipPermissions: true,
-    allowedTools: allowedTools || ['*'],
   };
+  if (allowedTools) options.allowedTools = allowedTools;
   if (apiKey) options.apiKey = apiKey;
 
   for await (const msg of query({ prompt: typeof item === 'string' ? item : JSON.stringify(item), options })) {
